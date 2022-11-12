@@ -1,6 +1,6 @@
 <?php
 
-require("include/layout.php");
+require("include/function.php");
 
 echo head("Template");
 
