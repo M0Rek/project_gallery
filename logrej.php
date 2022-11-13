@@ -51,8 +51,6 @@ debug_to_console($_SESSION["registration-error"]);
 if (isset($_SESSION["registration-error"])) {
     $errors = $_SESSION["registration-error"];
 
-    debug_to_console(print_r($errors));
-
     $html = '<div class="col-12">';
     $errDiv = '<div class="alert alert-danger" role="alert">';
 
@@ -132,9 +130,6 @@ if (isset($_SESSION["registration-recovery"])) {
 <?php
 if (isset($_SESSION["login-error"])) {
     $errors = $_SESSION["login-error"];
-
-    debug_to_console(print_r($errors));
-
 
     $html = '<div class="col-12">';
     $errDiv = '<div class="alert alert-danger" role="alert">';
