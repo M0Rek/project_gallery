@@ -3,3 +3,5 @@
 /.idea/jsLibraryMappings.xml
 /.idea/.gitignore
 /.idea/sqlDataSources.xml
+/.idea/sqldialects.xml
+/.idea/vcs.xml
