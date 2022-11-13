@@ -1,12 +1,17 @@
 <?php
 
-require("include/layout.php");
+session_start();
+require("include/function.php");
+
+
 
 echo head("Logowanie/Rejestracja");
+debug_to_console($_SESSION["registration-error"]);
 
 ?>
 
     <form id="registration-form" action="rejestracja.php" method="post" class="row g-3 needs-validation" novalidate>
+        <input type="hidden" name="T" value="register"/>
         <div class="col-md-4">
             <label for="register-username" class="form-label">Login</label>
             <input pattern="[A-Za-z0-9]{8,16}" name="username" type="text" class="form-control" id="register-username" placeholder="Login" required>
@@ -42,6 +47,7 @@ echo head("Logowanie/Rejestracja");
 
 
     <form id="login-form" method="post" class="row g-3 needs-validation" novalidate>
+        <input type="hidden" name="T" value="login"/>
         <div class="col-md-4">
             <label for="login-username" class="form-label">Login</label>
             <input type="text" class="form-control" id="login-username" placeholder="Login" required>
@@ -64,7 +70,37 @@ echo head("Logowanie/Rejestracja");
 
 <?php
 
-echo footer("validation.js");
+if(isset($_SESSION["registration-error"])) {
+    $errors = $_SESSION["registration-error"];
+
+    debug_to_console(print_r($_SESSION));
+
+    $html = '<div class="col-12">';
+
+    if($errors["invalid-username"]) {
+        $html .= '
+        <div class="alert alert-danger" role="alert">
+           Login musi mieć od 8 do 16 znaków, tylko litery i cyfry.
+        </div>';
+    }
+
+    $html .= '</div>';
+
+    return $html;
+};
+
+if(isset($_SESSION["registration-recovery"])) {
+    $recovery = $_SESSION["registration-recovery"];
+    echo '
+<script>
+  document.getElementById("register-username").value ="'.$recovery["login"].'"
+  document.getElementById("register-password").value ="'.$recovery["password"].'"
+  document.getElementById("register-password-retyped").value = "'.$recovery["retyped"].'"
+  document.getElementById("register-email").value = "'.$recovery["email"].'"
+</script>';
+};
+
+echo footer();
 
 
 
