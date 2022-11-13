@@ -10,12 +10,9 @@ print_r($_SESSION["user-data"]);
 ?>
 
 
-
 <?php
 
 echo footer();
-
-
 
 
 ?>
