@@ -1,6 +1,5 @@
 <?php
 require("include/function.php");
-session_start();
 
 echo head("Pomyślna rejestracja");
 

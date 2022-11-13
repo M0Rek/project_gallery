@@ -1,4 +1,5 @@
 <?php
+session_start();
 include("define.php");
 include("layout.php");
 

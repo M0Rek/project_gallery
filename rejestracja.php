@@ -1,6 +1,5 @@
 <?php
 /** @noinspection PhpUndefinedVariableInspection */
-session_start();
 require("include/function.php");
 require("include/database.php");
 
