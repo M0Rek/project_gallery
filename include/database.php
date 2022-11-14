@@ -16,16 +16,6 @@ function connectToDB()
     return $conn;
 }
 
-function disconnectDB()
-{
-    $conn = $GLOBALS["conn"];
-    if ($conn) {
-        mysqli_close($conn);
-
-    }
-    return null;
-}
-
 /**
  * @param mysqli_result $result
  * @return array
