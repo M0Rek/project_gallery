@@ -1,26 +1,16 @@
 <?php
 
-session_start();
 require("include/function.php");
 
 
 echo head("Logowanie/Rejestracja");
-debug_to_console($_SESSION["registration-error"]);
-
 ?>
 
 
     <div class="container-lg mt-5">
-        <div class="row justify-content-around text-center">
-            <div class="col-lg-5">
-                <h2>Rejestracja</h2>
-            </div>
-            <div class="col-lg-5">
-                <h2>Logowanie</h2>
-            </div>
-        </div>
         <div class="row justify-content-around">
             <div class="col-lg-5">
+                <h2 class="text-center">Rejestracja</h2>
                 <form id="registration-form" action="rejestracja.php" method="post" class="row g-3 needs-validation"
                       novalidate>
                     <input type="hidden" name="T" value="register"/>
@@ -57,43 +47,37 @@ debug_to_console($_SESSION["registration-error"]);
                 if (isset($_SESSION["registration-error"])) {
                     $errors = $_SESSION["registration-error"];
 
-                    $html = '<div class="pt-3">';
+                    $html = '<div class="pt-5">';
                     $errDiv = '<div class="alert alert-danger" role="alert">';
 
                     if ($errors["invalid-username"]) {
                         $html .= $errDiv . '
-           Login musi mieć od 8 do 16 znaków, tylko litery i cyfry.
-        </div>';
+           Login musi mieć od 8 do 16 znaków, tylko litery i cyfry.</div>';
                     }
 
                     if ($errors["invalid-password"]) {
                         $html .= $errDiv . '
-            Hasło musi mieć od 8 do 20 znaków, minimum 1 duża litera, 1 mała litera i 1 cyfra.
-        </div>';
+            Hasło musi mieć od 8 do 20 znaków, minimum 1 duża litera, 1 mała litera i 1 cyfra.</div>';
                     }
 
                     if ($errors["invalid-retyped"]) {
                         $html .= $errDiv . '
-            Upewnij się, że hasła są takie same.
-        </div>';
+            Upewnij się, że hasła są takie same.</div>';
                     }
 
                     if ($errors["invalid-email"]) {
                         $html .= $errDiv . '
-            Email nie jest poprawny.
-        </div>';
+            Email nie jest poprawny.</div>';
                     }
 
                     if ($errors["database-error"]) {
                         $html .= $errDiv . '
-            Błąd połączenia z bazą danych.
-        </div>';
+            Błąd połączenia z bazą danych.</div>';
                     }
 
                     if ($errors["username-exists"]) {
                         $html .= $errDiv . '
-            Ten login jest już zajęty!
-        </div>';
+            Ten login jest już zajęty!</div>';
                     }
 
                     $html .= '</div>';
@@ -113,6 +97,7 @@ debug_to_console($_SESSION["registration-error"]);
                 } ?>
             </div>
             <div class="col-lg-5">
+                <h2 class="text-center">Logowanie</h2>
                 <form id="login-form" action="logowania.php" method="post" class="row g-3 needs-validation" novalidate>
                     <input type="hidden" name="T" value="login"/>
                     <label for="login-username" class="form-label">Login</label>
@@ -128,37 +113,34 @@ debug_to_console($_SESSION["registration-error"]);
                     </div>
                     <button class="btn btn-primary" type="submit">Zaloguj się</button>
                 </form>
+                <?php
+                if (isset($_SESSION["login-error"])) {
+                    $errors = $_SESSION["login-error"];
+
+                    $html = '<div class="pt-5">';
+                    $errDiv = '<div class="alert alert-danger" role="alert">';
+
+                    if ($errors["invalid-credentials"]) {
+                        $html .= $errDiv . '
+           Nie ma takiego użytkownika.</div>';
+                    }
+
+                    if ($errors["database-error"]) {
+                        $html .= $errDiv . '
+            Błąd połączenia z bazą danych.</div>';
+                    }
+
+                    if ($errors["user-blocked"]) {
+                        $html .= $errDiv . '
+            Konto zostało zablokowane.</div>';
+                    }
+
+                    $html .= '</div>';
+
+                    echo $html;
+                }
+                ?>
             </div>
-            <?php
-            if (isset($_SESSION["login-error"])) {
-                $errors = $_SESSION["login-error"];
-
-                $html = '<div class="pt-3">';
-                $errDiv = '<div class="alert alert-danger" role="alert">';
-
-                if ($errors["invalid-credentials"]) {
-                    $html .= $errDiv . '
-           Nie ma takiego użytkownika.
-        </div>';
-                }
-
-                if ($errors["database-error"]) {
-                    $html .= $errDiv . '
-            Błąd połączenia z bazą danych.
-        </div>';
-                }
-
-                if ($errors["user-blocked"]) {
-                    $html .= $errDiv . '
-            Konto zostało zablokowane.
-        </div>';
-                }
-
-                $html .= '</div>';
-
-                echo $html;
-            }
-            ?>
         </div>
     </div>
 
