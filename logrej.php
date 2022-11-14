@@ -3,11 +3,10 @@
 require("include/function.php");
 
 
-echo head("Logowanie/Rejestracja");
+echo head("Logowanie/Rejestracja" , "logrej");
 ?>
 
 
-    <div class="container-lg mt-5">
         <div class="row justify-content-around">
             <div class="col-lg-5">
                 <h2 class="text-center">Rejestracja</h2>
@@ -142,9 +141,8 @@ echo head("Logowanie/Rejestracja");
                 ?>
             </div>
         </div>
-    </div>
 
 <?php
-echo footer("validation.js");
+echo footer("logrej-validation.js");
 
 ?>
