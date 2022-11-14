@@ -77,17 +77,16 @@ function navbarItems()
     return $txt;
 }
 
-function pagination($currentPage, $pageCount, $GETParameters = "")
+//TODO Make next and previous work and fix get
+function pagination($currentPage, $pageCount)
 {
-    if (!empty($GETParam)) {
-        $get = "&";
-        $get .= htmlspecialchars($GETParam);
+    if (isset($_GET)) {
+        $get = getParamsToUrl(array("page"));
     }
     else $get = "";
 
     if ($pageCount == 1)
         return "";
-
 
     $txt = '<ul class="col-12 pagination justify-content-center">
                 <li class="page-item '.(($currentPage == 1) ? "disabled" : "").'">
@@ -97,7 +96,7 @@ function pagination($currentPage, $pageCount, $GETParameters = "")
                 </li>';
 
 
-    for ($i = 1; $i < $pageCount; $i++) {
+    for ($i = 1; $i <= $pageCount; $i++) {
         $txt .= '<li class="page-item '.(($currentPage == $i) ? "disabled" : "").'"><a class="page-link" href="?page='.$i.$get.'">'.$i.'</a></li>';
     }
 
@@ -108,4 +107,20 @@ function pagination($currentPage, $pageCount, $GETParameters = "")
                 </li>
              </ul>';
     return $txt;
+}
+
+/**
+ * @param $excludeKeys
+ * @return string End part of url containing not excluded get values
+ */
+function getParamsToUrl($excludeKeys) {
+
+    $url = "";
+    if(isset($_GET)) {
+        foreach ($_GET as $key => $value) {
+            if(!in_array($key,$excludeKeys))
+                $url .= "&".$key."=".$value;
+        }
+    }
+    return $url;
 }
