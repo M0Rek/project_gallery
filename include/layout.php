@@ -1,7 +1,7 @@
 <?php
 
 //Use head() and footer() functions together and in that order on each site. Otherwise, the body tag won't get closed correctly.
-function head($title = "")
+function head($title = "", $active = "index")
 {
     return '
 <!DOCTYPE html>
@@ -14,7 +14,9 @@ function head($title = "")
     <link href="style/style.css" rel="stylesheet">
 </head>
 <body>
-' . navbar();
+<div id="wrap">
+' . navbar($active) . '
+<div class="container-md mt-5">';
 }
 
 function footer($script = "")
@@ -32,46 +34,59 @@ var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
 })
     </script>';
 
-    $txt .= '</body></html>';
+    $txt .= '
+</div>
+</div>
+<div class="footer">
+<h5 class="text-end text-secondary me-3">Wykonano przez: Michał Morawski</h5>
+</div>
+</body>
+</html>';
 
     return $txt;
 }
 
-function navbar($current = "index")
+function isActive($active, $nav)
+{
+    return ($active == $nav) ? " active" : "";
+}
+
+function navbar($active = "index")
 {
     return '
-<nav class="navbar navbar-expand-lg bg-light">
+<nav class="navbar navbar-dark bg-primary navbar-expand-lg">
   <div class="container-fluid">
     <a class="navbar-brand" id="index" href="index.php">Galeria</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-      ' . navbarItems() . '
+      ' . navbarItems($active) . '
     </div>
   </div>
 </nav>';
 }
 
-function navbarItems()
+function navbarItems($active)
 {
     $userData = (isset($_SESSION["user-data"])) ? $_SESSION["user-data"] : null;
 
-    $txt = '<ul class="navbar-nav">';
-    $txt .= '<li class="nav-item"><a id="dodaj-album" class="nav-link" href="' . (isset($userData) ? "dodaj-album.php" : "logrej.php") . '">Załóż album</a></li>';
-    $txt .= '<li class="nav-item"><a id="dodaj-foto" class="nav-link" href="' . (isset($userData) ? "dodaj-foto.php" : "logrej.php") . '">Dodaj zdjęcie</a></li>';
-    $txt .= '<li class="nav-item"><a id="top-foto" class="nav-link" href="top-foto.php">Najlepiej oceniane</a></li>';
-    $txt .= '<li class="nav-item" ><a id="nowe-foto" class="nav-link" href = "nowe-foto.php" >Najnowsze</a ></li >';
+
+    $txt = '<ul class="navbar-nav mr-auto">';
+    $txt .= '<li class="nav-item"><a id="dodaj-album" class="nav-link' . isActive($active, "dodaj-album") . '" href="' . (isset($userData) ? "dodaj-album.php" : "logrej.php") . '">Załóż album</a></li>';
+    $txt .= '<li class="nav-item"><a id="dodaj-foto" class="nav-link' . isActive($active, "dodaj-foto") . '" href="' . (isset($userData) ? "dodaj-foto.php" : "logrej.php") . '">Dodaj zdjęcie</a></li>';
+    $txt .= '<li class="nav-item"><a id="top-foto" class="nav-link' . isActive($active, "top-foto") . '" href="top-foto.php">Najlepiej oceniane</a></li>';
+    $txt .= '<li class="nav-item" ><a id="nowe-foto" class="nav-link' . isActive($active, "nowe-foto") . '" href = "nowe-foto.php" >Najnowsze</a ></li >';
     if (isset($userData)) {
-        $txt .= '<li class="nav-item" ><a id="konto" class="nav-link" href = "konto.php" >Moje konto</a ></li >';
-        $txt .= '<li class="nav-item" ><a id="wyloguj" class="nav-link" href = "wyloguj.php" >Wyloguj się</a ></li >';
+        $txt .= '<li class="nav-item" ><a id="konto" class="nav-link' . isActive($active, "konto") . '" href = "konto.php" >Moje konto</a ></li >';
+        $txt .= '<li class="nav-item" ><a id="wyloguj" class="nav-link' . isActive($active, "wyloguj") . '" href = "wyloguj.php" >Wyloguj się</a ></li >';
 
         if ($userData["role"] == "moderator" || $userData["role"] == "administrator") {
-            $txt .= '<li class="nav-item" ><a id="admin" class="nav-link" href = "admin/index.php" >Panel administracyjny</a ></li >';
+            $txt .= '<li class="nav-item" ><a id="admin" class="nav-link' . isActive($active, "admin") . '" href = "admin/index.php" >Panel administracyjny</a ></li >';
         }
     } else {
-        $txt .= '<li class="nav-item" ><a id="log" class="nav-link" href = "logrej.php" >Zaloguj się</a ></li >';
-        $txt .= '<li class="nav-item" ><a id="rej" class="nav-link" href = "logrej.php" >Rejestracja</a ></li >';
+        $txt .= '<li class="nav-item" ><a id="log" class="nav-link' . isActive($active, "logrej") . '" href = "logrej.php" >Zaloguj się</a ></li >';
+        $txt .= '<li class="nav-item" ><a id="rej" class="nav-link' . isActive($active, "logrej") . '" href = "logrej.php" >Rejestracja</a ></li >';
     }
     $txt .= '</ul>';
     return $txt;
@@ -82,14 +97,13 @@ function pagination($currentPage, $pageCount)
 {
     if (isset($_GET)) {
         $get = getParamsToUrl(array("page"));
-    }
-    else $get = "";
+    } else $get = "";
 
     if ($pageCount == 1)
         return "";
 
     $txt = '<ul class="col-12 pagination justify-content-center">
-                <li class="page-item '.(($currentPage == 1) ? "disabled" : "").'">
+                <li class="page-item ' . (($currentPage == 1) ? "disabled" : "") . '">
                     <a class="page-link" href="#" aria-label="Previous">
                         <span>&laquo;</span>
                     </a>
@@ -97,10 +111,10 @@ function pagination($currentPage, $pageCount)
 
 
     for ($i = 1; $i <= $pageCount; $i++) {
-        $txt .= '<li class="page-item '.(($currentPage == $i) ? "disabled" : "").'"><a class="page-link" href="?page='.$i.$get.'">'.$i.'</a></li>';
+        $txt .= '<li class="page-item ' . (($currentPage == $i) ? "disabled" : "") . '"><a class="page-link" href="?page=' . $i . $get . '">' . $i . '</a></li>';
     }
 
-    $txt .= '<li class="page-item '.(($currentPage == $pageCount) ? "disabled" : "").'">
+    $txt .= '<li class="page-item ' . (($currentPage == $pageCount) ? "disabled" : "") . '">
                     <a class="page-link" href="#" aria-label="Next">
                         <span>&raquo;</span>
                     </a>
@@ -113,13 +127,14 @@ function pagination($currentPage, $pageCount)
  * @param $excludeKeys
  * @return string End part of url containing not excluded get values
  */
-function getParamsToUrl($excludeKeys) {
+function getParamsToUrl($excludeKeys)
+{
 
     $url = "";
-    if(isset($_GET)) {
+    if (isset($_GET)) {
         foreach ($_GET as $key => $value) {
-            if(!in_array($key,$excludeKeys))
-                $url .= "&".$key."=".$value;
+            if (!in_array($key, $excludeKeys))
+                $url .= "&" . $key . "=" . $value;
         }
     }
     return $url;

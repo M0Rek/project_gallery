@@ -2,7 +2,7 @@
 
 require("include/function.php");
 
-echo head("Template");
+echo head("Template", "template");
 
 
 echo footer();

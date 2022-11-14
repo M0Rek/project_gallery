@@ -60,12 +60,10 @@ while ($row = $result->fetch_assoc()) {
     $albums[] = $row;
 }
 
-echo head("Strona główna");
+echo head("Strona główna", "index");
 
 ?>
 
-
-<div class="container-md mt-5">
 
     <div class="row m-3">
         <div class="col-md-4">
@@ -120,7 +118,7 @@ echo head("Strona główna");
     <div class="row m-3">
         <?php echo pagination($currentPage,$pageCount) ?>
     </div>
-</div>
+
 
 
 <?php
