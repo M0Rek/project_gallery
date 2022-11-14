@@ -32,13 +32,27 @@ $stmt = $conn->prepare("SELECT count(*) as count FROM albumy INNER JOIN
 $stmt->execute();
 $result = $stmt->get_result();
 
+$itemsPerPage = 20;
 $itemsCount = $result->fetch_assoc()["count"];
-$itemsPerPage = 2;
-$pageCount = ceil($result->num_rows / $itemsPerPage);
+$pageCount = ceil($itemsCount / $itemsPerPage);
+
+if(isset($_GET["page"])) {
+    $getPage = intval($_GET["page"]);
+
+    if($getPage > $pageCount)
+        $currentPage = $pageCount;
+
+    else if($getPage < 1)
+        $currentPage = 1;
+
+    else $currentPage = $getPage;
+}
+else $currentPage = 1;
+
 
 $stmt = $conn->prepare("SELECT albumy.id as id, zaakceptowane.id as zdjecie,tytul, date(data) as data ,uzytkownicy.login as tworca FROM albumy INNER JOIN 
     (SELECT id,opis,id_albumu,min(data),zaakceptowane FROM zdjecia WHERE zaakceptowane = 1 GROUP BY id_albumu) as zaakceptowane on zaakceptowane.id_albumu = albumy.id
-        LEFT JOIN uzytkownicy ON id_uzytkownika = uzytkownicy.id ORDER BY " . $sort . " " . $asc);
+        LEFT JOIN uzytkownicy ON id_uzytkownika = uzytkownicy.id ORDER BY " . $sort . " " . $asc . " LIMIT ".(($currentPage - 1) * $itemsPerPage).", ".$itemsPerPage);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -104,7 +118,7 @@ echo head("Strona główna");
         ?>
     </div>
     <div class="row m-3">
-        <?php echo pagination(5, 10, "") ?>
+        <?php echo pagination($currentPage,$pageCount) ?>
     </div>
 </div>
 
