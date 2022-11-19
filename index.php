@@ -77,7 +77,8 @@ echo head("Strona główna", "index");
                 <option value="tworca">Twórca</option>
             </select>
             <div class="form-check form-switch pt-2">
-                <input class="form-check-input" checked onchange="sortAlbums()" type="checkbox" id="album-asc">
+                <input class="form-check-input" <?php echo (isset($_GET["asc"]) && $_GET["asc"] == "false") ? "" : "checked" ?>
+                       onchange="sortAlbums()" type="checkbox" id="album-asc">
                 <label class="form-check-label" for="album-asc">Sortuj rosnąco</label>
             </div>
         </div>
@@ -88,9 +89,6 @@ echo head("Strona główna", "index");
                 echo 'document.getElementById("album-sort").value = "' . $_GET["sort"] . '";';
             }
 
-            if (isset($_GET["asc"])) {
-                echo 'document.getElementById("album-asc").checked = ("' . $_GET["asc"] . '" == "false") ? false : true ;';
-            }
 
             ?>
 
