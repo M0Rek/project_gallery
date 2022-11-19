@@ -11,44 +11,57 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['T'] == 'add-album') {
     // Nie ma potrzeby na sprawdzenie tytułu czy ma niebezpieczne znaki;
     // Przygotowane kwerendy zawsze traktują parametry jako dane i ignorują znaki specjalne.
     $title = $_POST["title"];
-    $conn = connectToDB();
-    unset($_SESSION["add-album-error"]);
 
-    if ($title == "") {
-        $_SESSION["add-album-error"]["invalid-title"] = true;
-    }
-    else {
+    function insertAlbum($title)
+    {
+        $conn = connectToDB();
+        unset($_SESSION["add-album-error"]);
+
+        if ($title == "") {
+            $_SESSION["add-album-error"]["invalid-title"] = true;
+            return false;
+        }
         if (!$conn) {
             $_SESSION["add-album-error"]["database-error"] = true;
-        } else {
-            $conn->begin_transaction();
-            try {
-                $stmt = $conn->prepare("SELECT * FROM albumy where tytul LIKE ?");
-                $stmt->bind_param('s', $title);
-                $stmt->execute();
-                $result = $stmt->get_result();
-                if ($result->num_rows == 0) {
-                    $stmt = $conn->prepare(" INSERT INTO albumy (id,tytul,data,id_uzytkownika)
-                    VALUES (default, ?, NOW(), " . $_SESSION["user-data"]["id"] . ")");
-                    $stmt->bind_param('s', $title);
-                    if (!$stmt->execute()) {
-                        $_SESSION["add-album-error"]["database-error"] = true;
-                        $conn->rollback();
-                    } else {
-                        $id = $conn->insert_id;
-                        mkdir("photo/".$id);
-                        $conn->commit();
-                    }
-                } else {
-                    $_SESSION["registration-error"]["title-exists"] = true;
-                    $conn->rollback();
-                }
-            } catch (mysqli_sql_exception $e) {
-                $_SESSION["add-album-error"]["database-error"] = true;
+            return false;
+        }
+
+        $conn->begin_transaction();
+        try {
+            $stmt = $conn->prepare("SELECT * FROM albumy where tytul LIKE ?");
+            $stmt->bind_param('s', $title);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows != 0) {
+                $_SESSION["registration-error"]["title-exists"] = true;
                 $conn->rollback();
+                return false;
             }
+
+                $stmt = $conn->prepare(" INSERT INTO albumy (id,tytul,data,id_uzytkownika) VALUES (default, ?, NOW(), " . $_SESSION["user-data"]["id"] . ")");
+                $stmt->bind_param('s', $title);
+
+                if (!$stmt->execute()) {
+                    $_SESSION["add-album-error"]["database-error"] = true;
+                    $conn->rollback();
+                    return false;
+                }
+
+                $id = $conn->insert_id;
+                mkdir("photo/" . $id);
+                $conn->commit();
+                header("Location: dodaj-foto.php");
+                exit();
+
+
+        } catch (mysqli_sql_exception $e) {
+            $_SESSION["add-album-error"]["database-error"] = true;
+            $conn->rollback();
         }
     }
+
+    insertAlbum($title);
 }
 
 echo head("Dodaj album", "dodaj-album");
