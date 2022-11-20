@@ -1,16 +1,16 @@
 (() => {
-    const addAlbumForm = document.getElementById("add-album-form");
-    const albumInput = document.getElementById("add-album-input");
-    const maxChars = 100;
+    const addAlbumForm = document.getElementById("add-album-form")
+    const albumInput = document.getElementById("add-album-input")
+    const maxChars = 100
 
-    let charsLeft = maxChars;
+    let charsLeft = maxChars
 
     albumInput.addEventListener("input", () => {
-        charsLeft = maxChars - albumInput.value.length;
+        charsLeft = maxChars - albumInput.value.length
         document.getElementById("chars-left-hint").innerHTML = charsLeft;
 
         //TODO fix empty field invalid shows valid
-        if(albumInput.value == null || albumInput.value.match(/[^\s\\]/g) === []) {
+        if (albumInput.value == null) {
             albumInput.reportValidity()
         }
     })

@@ -1,6 +1,5 @@
 <?php
 require("include/function.php");
-require("include/database.php");
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($_POST['T'] == 'login') {

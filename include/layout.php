@@ -15,6 +15,7 @@ function head($title = "", $active = "index")
 </head>
 <body>
 <div id="wrap">
+<div id="main">
 ' . navbar($active) . '
 <div class="container-md mt-5">';
 }
@@ -22,19 +23,13 @@ function head($title = "", $active = "index")
 function footer($script = "")
 {
     $txt = '<script src="javascript/bootstrap.bundle.min.js"></script>';
+    $txt .= '<script src="javascript/script.js"></script>';
 
     if ($script != "")
         $txt .= '<script src="javascript/' . $script . '"></script>';
 
-    $txt .=
-        '<script>
-var tooltipTriggerList = [].slice.call(document.querySelectorAll(\'[data-bs-toggle="tooltip"]\'))
-var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-  return new bootstrap.Tooltip(tooltipTriggerEl)
-})
-    </script>';
-
     $txt .= '
+</div>
 </div>
 </div>
 <div class="footer">

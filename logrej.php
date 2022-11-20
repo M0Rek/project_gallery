@@ -56,33 +56,27 @@ echo head("Logowanie/Rejestracja", "logrej");
                 $errDiv = '<div class="alert alert-danger" role="alert">';
 
                 if ($errors["invalid-username"]) {
-                    $html .= $errDiv . '
-           Login musi mieć od 8 do 16 znaków, tylko litery i cyfry.</div>';
+                    $html .= $errDiv . 'Login musi mieć od 8 do 16 znaków, tylko litery i cyfry.</div>';
                 }
 
                 if ($errors["invalid-password"]) {
-                    $html .= $errDiv . '
-            Hasło musi mieć od 8 do 20 znaków, minimum 1 duża litera, 1 mała litera i 1 cyfra.</div>';
+                    $html .= $errDiv . 'Hasło musi mieć od 8 do 20 znaków, minimum 1 duża litera, 1 mała litera i 1 cyfra.</div>';
                 }
 
                 if ($errors["invalid-retyped"]) {
-                    $html .= $errDiv . '
-            Upewnij się, że hasła są takie same.</div>';
+                    $html .= $errDiv . 'Upewnij się, że hasła są takie same.</div>';
                 }
 
                 if ($errors["invalid-email"]) {
-                    $html .= $errDiv . '
-            Email nie jest poprawny.</div>';
+                    $html .= $errDiv . 'Email nie jest poprawny.</div>';
                 }
 
                 if ($errors["database-error"]) {
-                    $html .= $errDiv . '
-            Błąd połączenia z bazą danych.</div>';
+                    $html .= $errDiv . 'Błąd połączenia z bazą danych.</div>';
                 }
 
                 if ($errors["username-exists"]) {
-                    $html .= $errDiv . '
-            Ten login jest już zajęty!</div>';
+                    $html .= $errDiv . 'Ten login jest już zajęty!</div>';
                 }
 
                 $html .= '</div>';
@@ -130,18 +124,15 @@ echo head("Logowanie/Rejestracja", "logrej");
                 $errDiv = '<div class="alert alert-danger" role="alert">';
 
                 if ($errors["invalid-credentials"]) {
-                    $html .= $errDiv . '
-           Nie ma takiego użytkownika.</div>';
+                    $html .= $errDiv . 'Nie ma takiego użytkownika.</div>';
                 }
 
                 if ($errors["database-error"]) {
-                    $html .= $errDiv . '
-            Błąd połączenia z bazą danych.</div>';
+                    $html .= $errDiv . 'Błąd połączenia z bazą danych.</div>';
                 }
 
                 if ($errors["user-blocked"]) {
-                    $html .= $errDiv . '
-            Konto zostało zablokowane.</div>';
+                    $html .= $errDiv . 'Konto zostało zablokowane.</div>';
                 }
 
                 $html .= '</div>';
