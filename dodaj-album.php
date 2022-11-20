@@ -1,6 +1,6 @@
 <?php
 include("include/function.php");
-include("include/database.php");
+
 if (!isset($_SESSION["user-data"])) {
     header("Location: logrej.php");
     exit();
@@ -8,60 +8,12 @@ if (!isset($_SESSION["user-data"])) {
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['T'] == 'add-album') {
 
-    // Nie ma potrzeby na sprawdzenie tytułu czy ma niebezpieczne znaki;
+    // Nie ma potrzeby na sprawdzenie tytułu, czy ma niebezpieczne znaki;
     // Przygotowane kwerendy zawsze traktują parametry jako dane i ignorują znaki specjalne.
     $title = $_POST["title"];
+    $conn = connectToDB();
 
-    function insertAlbum($title)
-    {
-        $conn = connectToDB();
-        unset($_SESSION["add-album-error"]);
-
-        if ($title == "") {
-            $_SESSION["add-album-error"]["invalid-title"] = true;
-            return false;
-        }
-        if (!$conn) {
-            $_SESSION["add-album-error"]["database-error"] = true;
-            return false;
-        }
-
-        $conn->begin_transaction();
-        try {
-            $stmt = $conn->prepare("SELECT * FROM albumy where tytul LIKE ?");
-            $stmt->bind_param('s', $title);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if ($result->num_rows != 0) {
-                $_SESSION["registration-error"]["title-exists"] = true;
-                $conn->rollback();
-                return false;
-            }
-
-                $stmt = $conn->prepare(" INSERT INTO albumy (id,tytul,data,id_uzytkownika) VALUES (default, ?, NOW(), " . $_SESSION["user-data"]["id"] . ")");
-                $stmt->bind_param('s', $title);
-
-                if (!$stmt->execute()) {
-                    $_SESSION["add-album-error"]["database-error"] = true;
-                    $conn->rollback();
-                    return false;
-                }
-
-                $id = $conn->insert_id;
-                mkdir("photo/" . $id);
-                $conn->commit();
-                header("Location: dodaj-foto.php");
-                exit();
-
-
-        } catch (mysqli_sql_exception $e) {
-            $_SESSION["add-album-error"]["database-error"] = true;
-            $conn->rollback();
-        }
-    }
-
-    insertAlbum($title);
+    insertAlbum($conn, $title);
 }
 
 echo head("Dodaj album", "dodaj-album");
@@ -85,22 +37,23 @@ echo head("Dodaj album", "dodaj-album");
 </form>
 <?php
 if (isset($_SESSION["add-album-error"])) {
+
     $errors = $_SESSION["add-album-error"];
 
     $html = '<div class="pt-5">';
     $errDiv = '<div class="alert alert-danger" role="alert">';
 
-    if ($errors["title-exists"]) {
+    if (isset($errors["title-exists"])) {
         $html .= $errDiv . '
            Taki tytuł już istnieje.</div>';
     }
 
-    if ($errors["title-exists"]) {
+    if (isset($errors["invalid-title"])) {
         $html .= $errDiv . '
            Tytuł albumu nie może być pusty!</div>';
     }
 
-    if ($errors["database-error"]) {
+    if (isset($errors["database-error"])) {
         $html .= $errDiv . '
             Błąd połączenia z bazą danych.</div>';
     }
