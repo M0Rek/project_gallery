@@ -244,3 +244,151 @@ function savePhoto($conn)
 
     return true;
 }
+
+function getAlbumById($conn, $albumId)
+{
+    $stmt = $conn->prepare(
+        "SELECT albumy.id, tytul, uzytkownicy.login as tworca, albumy.data, count(*) as zdj_count FROM albumy 
+            INNER JOIN zdjecia ON zdjecia.id_albumu = albumy.id
+            LEFT JOIN uzytkownicy ON id_uzytkownika = uzytkownicy.id 
+            WHERE albumy.id = ? AND zdjecia.zaakceptowane = 1 GROUP BY albumy.id");
+    $stmt->bind_param("i", $albumId);
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+function getAcceptedPhotoById($conn, $photoId)
+{
+    $stmt = $conn->prepare("SELECT zdjecia.id as id, id_albumu , tytul, uzytkownicy.login as tworca, zdjecia.data as data, opis FROM zdjecia 
+            INNER JOIN albumy ON zdjecia.id_albumu = albumy.id
+            LEFT JOIN uzytkownicy ON id_uzytkownika = uzytkownicy.id 
+            WHERE zdjecia.id = ? AND zdjecia.zaakceptowane = 1 GROUP BY albumy.id");
+    $stmt->bind_param("i", $photoId);
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+function getRating($conn, $photoId)
+{
+    $stmt = $conn->prepare("SELECT avg(ocena) as ocena, count(*) as count FROM zdjecia_oceny WHERE id_zdjecia = ?");
+    $stmt->bind_param("i", $photoId);
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+function getPhotoRatingByUser($conn, $photoId, $userId)
+{
+    $stmt = $conn->prepare("SELECT ocena FROM zdjecia_oceny WHERE id_zdjecia = ? AND id_uzytkownika = ?");
+    $stmt->bind_param("ii", $photoId, $userId);
+    $stmt->execute();
+
+    if (($result = $stmt->get_result())->num_rows != 0) {
+        return $result->fetch_assoc()["ocena"];
+    }
+    return false;
+}
+
+function ratePhoto($conn, $photoId, $userId, $rating)
+{
+    unset($_SESSION["add-rating-error"]);
+
+
+    if (getPhotoRatingByUser($conn, $photoId, $userId)) {
+        $_SESSION["add-rating-error"]["already-rated"] = true;
+        return false;
+    }
+
+    if ($rating > 10 || $rating < 1) {
+        $_SESSION["add-rating-error"]["invalid-rating"] = true;
+        return false;
+    }
+
+    if (!isset($_SESSION["user-data"]) || $userId != $_SESSION["user-data"]["id"]) {
+        $_SESSION["add-rating-error"]["not-logged-in"] = true;
+        return false;
+    }
+
+    $stmt = $conn->prepare("INSERT INTO `zdjecia_oceny` (`id_zdjecia`, `id_uzytkownika`, `ocena`) VALUES (?, ?, ?);");
+    $stmt->bind_param("iii", $photoId, $userId, $rating);
+    if ($stmt->execute()) {
+        return true;
+    }
+    $_SESSION["add-rating-error"]["database-error"] = true;
+    return false;
+}
+
+function commentPhoto($conn, $photoId, $userId, $comment)
+{
+    unset($_SESSION["add-comment-error"]);
+
+    $comment = trim($comment);
+
+    if ($comment == "") {
+        $_SESSION["add-comment-error"]["invalid-comment"] = true;
+        return false;
+    }
+
+    if (!isset($_SESSION["user-data"]) || $userId != $_SESSION["user-data"]["id"]) {
+        $_SESSION["add-comment-error"]["not-logged-in"] = true;
+        return false;
+    }
+
+    $stmt = $conn->prepare("INSERT INTO `zdjecia_komentarze` (`id`,`id_zdjecia`, `id_uzytkownika`, `data`, `komentarz`, `zaakceptowany`) VALUES (default, ?, ?, now(), ?, 0);");
+    $stmt->bind_param("iis", $photoId, $userId, $comment);
+    if ($stmt->execute()) {
+        return true;
+    }
+    $_SESSION["add-comment-error"]["database-error"] = true;
+    return false;
+}
+
+function getPhotoComments($conn, $photoId)
+{
+    $stmt = $conn->prepare("SELECT komentarz, zdjecia_komentarze.data as data, uzytkownicy.login as tworca 
+    FROM `zdjecia_komentarze` 
+    LEFT JOIN uzytkownicy ON id_uzytkownika =  uzytkownicy.id WHERE id_zdjecia = ? ORDER BY data DESC");
+    $stmt->bind_param("i", $photoId);
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+function lastPhoto($conn, $albumId)
+{
+    $stmt = $conn->prepare("SELECT max(id) as id FROM `zdjecia` WHERE id_albumu = ?");
+    $stmt->bind_param("i", $albumId);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc()["id"];
+}
+
+function firstPhoto($conn, $albumId)
+{
+    $stmt = $conn->prepare("SELECT min(id) as id FROM `zdjecia` WHERE id_albumu = ?");
+    $stmt->bind_param("i", $albumId);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc()["id"];
+}
+
+function nextPhoto($conn, $photoId, $albumId)
+{
+    $stmt = $conn->prepare("SELECT id FROM `zdjecia` WHERE id_albumu = ? AND id > ?");
+    $stmt->bind_param("ii", $albumId, $photoId);
+    $stmt->execute();
+    $resultId = $stmt->get_result()->fetch_assoc()["id"];
+    if ($resultId !== null) {
+        return $resultId;
+    }
+    return firstPhoto($conn, $albumId);
+}
+
+function previousPhoto($conn, $photoId, $albumId)
+{
+    $stmt = $conn->prepare("SELECT id FROM `zdjecia` WHERE id_albumu = ? AND id < ?");
+    $stmt->bind_param("ii", $albumId, $photoId);
+    $stmt->execute();
+    $resultId = $stmt->get_result()->fetch_assoc()["id"];
+    if ($resultId !== null) {
+        return $resultId;
+    }
+    return lastPhoto($conn, $albumId);
+}
+
