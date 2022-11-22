@@ -9,7 +9,8 @@ function head($title = "", $active = "index")
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>' . $title . '</title>
+    <title>Galeria - ' . $title . '</title>
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
     <link href="style/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
     <link href="style/style.css" rel="stylesheet">
 </head>
@@ -49,7 +50,7 @@ function isActive($active, $nav)
 function navbar($active = "index")
 {
     return '
-<nav class="navbar navbar-dark bg-primary navbar-expand-lg">
+<nav class="navbar sticky-top navbar-dark bg-primary navbar-expand-lg">
   <div class="container-fluid">
     <a class="navbar-brand" id="index" href="index.php">Galeria</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,7 +88,6 @@ function navbarItems($active)
     return $txt;
 }
 
-//TODO Make next and previous work and fix get
 function pagination($currentPage, $pageCount)
 {
     if (isset($_GET)) {
@@ -98,8 +98,8 @@ function pagination($currentPage, $pageCount)
         return "";
 
     $txt = '<ul class="col-12 pagination justify-content-center">
-                <li class="page-item ' . (($currentPage == 1) ? "disabled" : "") . '">
-                    <a class="page-link" href="#" aria-label="Previous">
+                <li class="page-item ' . (($currentPage <= 1) ? "disabled" : "") . '">
+                    <a class="page-link" href="?page=' . ($currentPage - 1) . $get . '" aria-label="Previous">
                         <span>&laquo;</span>
                     </a>
                 </li>';
@@ -109,8 +109,8 @@ function pagination($currentPage, $pageCount)
         $txt .= '<li class="page-item ' . (($currentPage == $i) ? "disabled" : "") . '"><a class="page-link" href="?page=' . $i . $get . '">' . $i . '</a></li>';
     }
 
-    $txt .= '<li class="page-item ' . (($currentPage == $pageCount) ? "disabled" : "") . '">
-                    <a class="page-link" href="#" aria-label="Next">
+    $txt .= '<li class="page-item ' . (($currentPage >= $pageCount) ? "disabled" : "") . '">
+                    <a class="page-link" href="?page=' . ($currentPage + 1) . $get . '" aria-label="Next">
                         <span>&raquo;</span>
                     </a>
                 </li>
@@ -133,4 +133,18 @@ function getParamsToUrl($excludeKeys)
         }
     }
     return $url;
+}
+
+function backToAlbumsButton()
+{
+    return '<div class="my-2 d-flex">
+        <button type="button" onclick="redirectToPage(\'index.php\')" class="btn btn-secondary btn-sm">Powrót do albumów</button>
+    </div>';
+}
+
+function backToAlbumButton($albumId)
+{
+    return '<div class="my-2 d-flex">
+        <button type="button" onclick="redirectToPage(\'album.php?id=' . $albumId . '\')" class="btn btn-primary btn-sm">Powrót do albumu</button>
+    </div>';
 }
