@@ -37,6 +37,11 @@ if ($result->num_rows == 0) {
 
     ?>
     <div class="row">
+        <div class="text-center col-12">
+            <h3>Wybierz album</h3>
+        </div>
+    </div>
+    <div class="row">
         <table class="table table-hover table-striped">
             <thead>
             <tr>
@@ -70,11 +75,6 @@ if ($result->num_rows == 0) {
         </div>
         <?php
     } else {
-        $result = getPhotosByAlbum($conn, $albumId);
-
-        while ($row = $result->fetch_assoc()) {
-            $photos[] = $row;
-        }
 
         ?>
         <form enctype="multipart/form-data" class="row needs-validation" method="post" id="add-photo-form" novalidate>
@@ -135,6 +135,13 @@ if ($result->num_rows == 0) {
 
             echo $html;
         }
+
+        $result = getPhotosByAlbum($conn, $albumId, 0);
+
+        while ($row = $result->fetch_assoc()) {
+            $photos[] = $row;
+        }
+
         ?>
 
         <div class="row mt-3 d-flex justify-content-center g-3">
@@ -144,14 +151,14 @@ if ($result->num_rows == 0) {
                     echo '<div class="d-flex w-auto justify-content-center">
             <img alt="' . $photo["opis"] . '" 
             class="album-thumbnail" 
-            onclick="window.location.href=\'photo.php?id=' . $photo["id"] . '\'" 
+            onclick="window.location.href=\'foto.php?id=' . $photo["id"] . '\'" 
             data-bs-toggle="tooltip" 
             data-bs-html="true" 
             data-bs-placement="bottom" 
             data-bs-title="' . ($photo["opis"] != "" ? 'Opis: ' . $photo["opis"] . '<br>' : "") . '
             Utworzono: ' . $photo["data"] . '
             <br> Zaakceptowano: ' . ($photo["zaakceptowane"] == "1" ? "Tak" : "Nie") . '" 
-            src="photo/' . $photo["id_albumu"] . '/' . $photo["id"] . '-min.jpg"></div>';
+            src="' . minPhotoPath($photo["id_albumu"], $photo["id"]) . '"></div>';
                 }
             }
             ?>
