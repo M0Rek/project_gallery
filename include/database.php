@@ -133,6 +133,14 @@ function getPhotosByAlbum($conn, $albumId)
     return $stmt->get_result();
 }
 
+function getPhotosByAlbumPaginated($conn, $albumId, $accepted, $currentPage, $itemsPerPage)
+{
+    $stmt = $conn->prepare("SELECT id,opis,id_albumu,data,zaakceptowane FROM zdjecia WHERE id_albumu = ? AND zaakceptowane = ? LIMIT " . (($currentPage - 1) * $itemsPerPage) . ", " . $itemsPerPage);
+    $stmt->bind_param("ii", $albumId, $accepted);
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
 function insertPhoto($conn, $desc, $albumId)
 {
 
