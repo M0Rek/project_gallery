@@ -135,6 +135,12 @@ function getPhotosByAlbum($conn, $albumId)
 
 function insertPhoto($conn, $desc, $albumId)
 {
+
+    if (!isset($_SESSION["user-data"])) {
+        $_SESSION["add-photo-error"]["not-logged-in"] = true;
+        return false;
+    }
+
     $stmt = $conn->prepare("INSERT INTO `zdjecia` (`id`, `opis`, `id_albumu`, `data`, `zaakceptowane`) VALUES (DEFAULT, ?, ?, now(), 0);");
     $stmt->bind_param("si", $desc, $albumId);
     $stmt->execute();
@@ -194,6 +200,10 @@ function savePhoto($conn)
         return false;
     }
 
+    if (!$photoId = strval(insertPhoto($conn, $desc, $albumId))) {
+        $_SESSION["add-photo-error"]["database-error"] = true;
+        return false;
+    }
 
     $photoId = strval(insertPhoto($conn, $desc, $albumId));
     $path = $targetDir . basename($photoId . '.jpg');
