@@ -38,12 +38,20 @@ function insertAlbum($conn, $title)
 {
     unset($_SESSION["add-album-error"]);
 
+    $title = trim($title);
+
     if ($title == "") {
         $_SESSION["add-album-error"]["invalid-title"] = true;
         return false;
     }
+
     if (!$conn) {
         $_SESSION["add-album-error"]["database-error"] = true;
+        return false;
+    }
+
+    if (!isset($_SESSION["user-data"])) {
+        $_SESSION["add-album-error"]["not-logged-in"] = true;
         return false;
     }
 
@@ -62,8 +70,8 @@ function insertAlbum($conn, $title)
             return false;
         }
 
-        $stmt = $conn->prepare(" INSERT INTO albumy (id,tytul,data,id_uzytkownika) VALUES (default, ?, NOW(), " . $_SESSION["user-data"]["id"] . ")");
-        $stmt->bind_param('s', $title);
+        $stmt = $conn->prepare(" INSERT INTO albumy (id,tytul,data,id_uzytkownika) VALUES (default, ?, NOW(), ?)");
+        $stmt->bind_param('si', $title, $_SESSION["user-data"]["id"]);
 
         if (!$stmt->execute()) {
             $_SESSION["add-album-error"]["database-error"] = true;
