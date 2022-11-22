@@ -31,3 +31,27 @@ html, body {
 .cursor-pointer {
     cursor: pointer;
 }
+
+.img-btn {
+    background-color: var(--bs-primary);
+    border-radius: 15%;
+    padding: 0.4rem;
+    transform: translate(0, -50%);
+}
+
+.img-btn img {
+    height: 30px;
+    color: white;
+}
+
+.previous-img-btn {
+    left: 1%;
+}
+
+.next-img-btn {
+    right: 1%;
+}
+
+.big-image {
+    max-height: 90vh;
+}
