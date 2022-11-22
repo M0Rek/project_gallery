@@ -4,8 +4,6 @@
     const photoDescInput = document.getElementById("add-photo-input")
     const maxChars = 255
 
-    console.log('Im here')
-
     let charsLeft = maxChars
 
     photoDescInput.addEventListener("input", () => {
