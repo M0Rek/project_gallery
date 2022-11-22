@@ -43,3 +43,33 @@ function resizeImage($file, $w, $h, $maintainWidth)
 
     return $res;
 }
+
+function getCurrentPage($pageCount)
+{
+    $pageCount = intval($pageCount);
+
+    if (isset($_GET["page"])) {
+        $getPage = intval($_GET["page"]);
+
+        if ($getPage > $pageCount)
+            return $pageCount;
+
+        if ($getPage < 1)
+            return 1;
+
+        return $getPage;
+    }
+    return 1;
+}
+
+
+function photoPath($albumId, $photoId)
+{
+    return "photo/" . $albumId . "/" . $photoId . ".jpg";
+}
+
+
+function minPhotoPath($albumId, $photoId)
+{
+    return "photo/" . $albumId . "/" . $photoId . "-min.jpg";
+}
