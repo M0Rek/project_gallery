@@ -14,8 +14,7 @@ echo head("Logowanie/Rejestracja", "logrej");
                 <div class="col-12">
                     <label for="register-username" class="form-label">Login</label>
                     <input pattern="[A-Za-z0-9]{8,16}" name="username" type="text" class="form-control"
-                           id="register-username"
-                           placeholder="Login" required>
+                           id="register-username" required>
                     <div class="invalid-feedback" id="register-username-validation">
                         Login musi mieć od 8 do 16 znaków, tylko litery i cyfry.
                     </div>
@@ -44,7 +43,9 @@ echo head("Logowanie/Rejestracja", "logrej");
                         Email nie jest poprawny.
                     </div>
                 </div>
-                <button class="btn btn-primary" type="submit">Zarejestruj się</button>
+                <div class="col-12">
+                    <button class="btn btn-primary" type="submit">Zarejestruj się</button>
+                </div>
             </form>
 
             <?php
@@ -55,27 +56,27 @@ echo head("Logowanie/Rejestracja", "logrej");
                 $html = '<div class="pt-5">';
                 $errDiv = '<div class="alert alert-danger" role="alert">';
 
-                if ($errors["invalid-username"]) {
+                if (isset($errors["invalid-username"])) {
                     $html .= $errDiv . 'Login musi mieć od 8 do 16 znaków, tylko litery i cyfry.</div>';
                 }
 
-                if ($errors["invalid-password"]) {
+                if (isset($errors["invalid-password"])) {
                     $html .= $errDiv . 'Hasło musi mieć od 8 do 20 znaków, minimum 1 duża litera, 1 mała litera i 1 cyfra.</div>';
                 }
 
-                if ($errors["invalid-retyped"]) {
+                if (isset($errors["invalid-retyped"])) {
                     $html .= $errDiv . 'Upewnij się, że hasła są takie same.</div>';
                 }
 
-                if ($errors["invalid-email"]) {
+                if (isset($errors["invalid-email"])) {
                     $html .= $errDiv . 'Email nie jest poprawny.</div>';
                 }
 
-                if ($errors["database-error"]) {
+                if (isset($errors["database-error"])) {
                     $html .= $errDiv . 'Błąd połączenia z bazą danych.</div>';
                 }
 
-                if ($errors["username-exists"]) {
+                if (isset($errors["username-exists"])) {
                     $html .= $errDiv . 'Ten login jest już zajęty!</div>';
                 }
 
@@ -101,8 +102,7 @@ echo head("Logowanie/Rejestracja", "logrej");
                 <input type="hidden" name="T" value="login"/>
                 <div class="col-12">
                     <label for="login-username" class="form-label">Login</label>
-                    <input name="username" type="text" class="form-control" id="login-username" placeholder="Login"
-                           required>
+                    <input name="username" type="text" class="form-control" id="login-username" required>
                     <div class="invalid-feedback" id="login-username-validation">
                         Pole login nie może być puste!
                     </div>
@@ -114,7 +114,9 @@ echo head("Logowanie/Rejestracja", "logrej");
                         Pole hasło nie może być puste!
                     </div>
                 </div>
-                <button class="btn btn-primary" type="submit">Zaloguj się</button>
+                <div class="col-12">
+                    <button class="btn btn-primary" type="submit">Zaloguj się</button>
+                </div>
             </form>
             <?php
             if (isset($_SESSION["login-error"])) {
@@ -123,15 +125,15 @@ echo head("Logowanie/Rejestracja", "logrej");
                 $html = '<div class="pt-5">';
                 $errDiv = '<div class="alert alert-danger" role="alert">';
 
-                if ($errors["invalid-credentials"]) {
+                if (isset($errors["invalid-credentials"])) {
                     $html .= $errDiv . 'Nie ma takiego użytkownika.</div>';
                 }
 
-                if ($errors["database-error"]) {
+                if (isset($errors["database-error"])) {
                     $html .= $errDiv . 'Błąd połączenia z bazą danych.</div>';
                 }
 
-                if ($errors["user-blocked"]) {
+                if (isset($errors["user-blocked"])) {
                     $html .= $errDiv . 'Konto zostało zablokowane.</div>';
                 }
 

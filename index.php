@@ -9,17 +9,7 @@ $itemsPerPage = 20;
 $itemsCount = $result->fetch_assoc()["count"];
 $pageCount = ceil($itemsCount / $itemsPerPage);
 
-if (isset($_GET["page"])) {
-    $getPage = intval($_GET["page"]);
-
-    if ($getPage > $pageCount)
-        $currentPage = $pageCount;
-
-    else if ($getPage < 1)
-        $currentPage = 1;
-
-    else $currentPage = $getPage;
-} else $currentPage = 1;
+$currentPage = getCurrentPage($pageCount);
 
 //Wartości nie są bezpośrednio wprowadzone do kwerendy, co zapobiega sql injection
 if (isset($_GET["sort"])) {
@@ -107,7 +97,7 @@ echo head("Strona główna", "index");
             data-bs-title="Tytuł: ' . $album["tytul"] . '
             <br> Utworzono: ' . $album["krotka_data"] . '
             <br> Twórca: ' . $album["tworca"] . '" 
-            src="photo/' . $album["id"] . '/' . $album["zdjecie"] . '.jpg"/>
+            src="' . photoPath($album["id"], $album["zdjecie"]) . '"/>
             
             </div>';
         }

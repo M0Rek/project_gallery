@@ -1,7 +1,6 @@
 <?php
 /** @noinspection PhpUndefinedVariableInspection */
 require("include/function.php");
-require("include/database.php");
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['T'] == 'register') {
     session_unset(); // Rozważyć zastąpienie unsetem indywidualnych pól sesji
