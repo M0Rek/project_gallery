@@ -43,6 +43,7 @@ $id = "";
 if ($row = $result->fetch_assoc()) {
     $exists = true;
     $id = $row['id'];
+    $albumId = $row["id_albumu"];
 }
 
 echo head("Zdjęcie " . $id);
@@ -53,7 +54,7 @@ if (!$exists) {
     <?php
     echo backToAlbumsButton();
 } else {
-    echo backToAlbumButton($row["id_albumu"]);
+    echo backToAlbumButton($albumId);
     ?>
     <div class="card">
         <div class="card-header">
@@ -251,7 +252,7 @@ if (!$exists) {
         </div>
     </div>
     <?php
-    echo backToAlbumButton($row["id_albumu"]);
+    echo backToAlbumButton($albumId);
 
 
 }
