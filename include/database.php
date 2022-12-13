@@ -213,7 +213,6 @@ function savePhoto($conn)
         return false;
     }
 
-    $photoId = strval(insertPhoto($conn, $desc, $albumId));
     $path = $targetDir . basename($photoId . '.jpg');
     $minPath = $targetDir . basename($photoId . '-min.jpg');
 
