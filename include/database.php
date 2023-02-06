@@ -133,6 +133,31 @@ function getPhotosByAlbum($conn, $albumId)
     return $stmt->get_result();
 }
 
+function getTopPhotos($conn, $itemsNo)
+{
+    // Założono, że najlepiej oceniane zdjęcia muszą mieć minimum jedną ocenę.
+    $stmt = $conn->prepare("SELECT zdjecia.id as id,opis,id_albumu,zdjecia.data as data, zaakceptowane,uzytkownicy.login as tworca,  avg(ocena) as ocena, tytul as tytul_albumu FROM zdjecia
+                                             INNER JOIN zdjecia_oceny ON id_zdjecia = id 
+                                             INNER JOIN albumy on id_albumu = albumy.id
+                                             LEFT JOIN uzytkownicy on albumy.id_uzytkownika = uzytkownicy.id                                                                    
+                                             GROUP BY id ORDER BY ocena DESC LIMIT ?");
+    $stmt->bind_param("i", $itemsNo);
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+function getNewestPhotos($conn, $itemsNo)
+{
+    $stmt = $conn->prepare("SELECT zdjecia.id as id,opis,id_albumu,zdjecia.data as data,zaakceptowane,uzytkownicy.login as tworca , avg(ocena) as ocena, tytul as tytul_albumu FROM zdjecia
+                                             INNER JOIN albumy on id_albumu = albumy.id      
+                                             LEFT JOIN zdjecia_oceny ON id_zdjecia = zdjecia.id 
+                                             LEFT JOIN uzytkownicy on albumy.id_uzytkownika = uzytkownicy.id                                                                    
+                                             GROUP BY id,data ORDER BY data DESC LIMIT ?");
+    $stmt->bind_param("i", $itemsNo);
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
 function getPhotosByAlbumPaginated($conn, $albumId, $accepted, $currentPage, $itemsPerPage)
 {
     $stmt = $conn->prepare("SELECT id,opis,id_albumu,data,zaakceptowane FROM zdjecia WHERE id_albumu = ? AND zaakceptowane = ? LIMIT " . (($currentPage - 1) * $itemsPerPage) . ", " . $itemsPerPage);
