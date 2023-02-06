@@ -148,3 +148,24 @@ function backToAlbumButton($albumId)
         <button type="button" onclick="redirectToPage(\'album.php?id=' . $albumId . '\')" class="btn btn-primary btn-sm">Powrót do albumu</button>
     </div>';
 }
+
+function photos($photos)
+{
+    $txt = "";
+    foreach ($photos as $photo) {
+        $txt .= '<div class="d-flex w-auto justify-content-center">
+            <img alt="' . $photo["opis"] . '" 
+            class="album-thumbnail" 
+            onclick="window.location.href=\'foto.php?id=' . $photo["id"] . '\'" 
+            data-bs-toggle="tooltip" 
+            data-bs-html="true" 
+            data-bs-placement="bottom" 
+            data-bs-title="' . ($photo["opis"] != "" ? '<b>Opis:</b> ' . $photo["opis"] . '<br>' : "") . '
+            <b>Utworzono:</b> ' . $photo["data"] . '<br>  
+            <b>Autor:</b> ' . $photo["tworca"] . '<br> 
+            <b>Album:</b> ' . $photo["tytul_albumu"] . '<br>
+            <b>Ocena:</b> ' . $photo["ocena"] . '"  
+            src="' . minPhotoPath($photo["id_albumu"], $photo["id"]) . '"></div>';
+    }
+    return $txt;
+}
