@@ -63,18 +63,7 @@ if (!$exists) {
 
         <?php
         if (isset($photos)) {
-            foreach ($photos as $photo) {
-                echo '<div class="d-flex w-auto justify-content-center">
-            <img alt="' . $photo["opis"] . '" 
-            class="album-thumbnail" 
-            onclick="window.location.href=\'foto.php?id=' . $photo["id"] . '\'" 
-            data-bs-toggle="tooltip" 
-            data-bs-html="true" 
-            data-bs-placement="bottom" 
-            data-bs-title="' . ($photo["opis"] != "" ? 'Opis: ' . $photo["opis"] . '<br>' : "") . '
-            Utworzono: ' . $photo["data"] . '" 
-            src="' . minPhotoPath($photo["id_albumu"], $photo["id"]) . '"></div>';
-            }
+            echo photos($photos);
         }
         ?>
     </div>
