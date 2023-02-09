@@ -24,14 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['T'] == 'register') {
     $retyped = $_POST["retyped"];
     $email = trim($_POST["email"]);
 
-    $loginRegex = "/[A-Za-z0-9]{8,16}/";
-    $passwordRegex = "/(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9!@#$%^&*]{8,20}/";
-
-    if (!preg_match($loginRegex, $login)) {
+    if (!preg_match(LOGIN_REGEX, $login)) {
         $_SESSION["registration-error"]["invalid-username"] = true;
     }
 
-    if (!preg_match($passwordRegex, $password)) {
+    if (!preg_match(PWD_REGEX, $password)) {
         $_SESSION["registration-error"]["invalid-password"] = true;
     }
 

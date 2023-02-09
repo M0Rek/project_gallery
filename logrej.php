@@ -21,7 +21,7 @@ echo head("Logowanie/Rejestracja", "logrej");
                 </div>
                 <div class="col-12">
                     <label for="register-password" class="form-label">Hasło</label>
-                    <input pattern="(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9!@#$%^&*]{8,20}" name="password"
+                    <input pattern="(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,20}" name="password"
                            type="password"
                            class="form-control" id="register-password" required>
                     <div class="invalid-feedback" id="register-password-validation">

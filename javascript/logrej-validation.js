@@ -50,7 +50,7 @@ function IsValidRegistration() {
         result = false
     }
 
-    if (password.value.match(/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9!@#$%^&*]{8,20}$/g) == null) {
+    if (!validatePassword(password.value)) {
         result = false
     }
 
