@@ -1,7 +1,7 @@
 <?php
 require("include/function.php");
 
-echo head("Najlepiej oceniane");
+echo head("Najlepiej oceniane", "top-foto");
 
 
 $items = 20;

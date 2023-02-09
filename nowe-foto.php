@@ -1,7 +1,7 @@
 <?php
 require("include/function.php");
 
-echo head("Najnowsze");
+echo head("Najnowsze", "nowe-foto");
 
 
 $items = 20;
