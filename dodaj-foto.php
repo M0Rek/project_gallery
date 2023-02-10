@@ -136,7 +136,7 @@ if ($result->num_rows == 0) {
             echo $html;
         }
 
-        $result = getPhotosByAlbum($conn, $albumId, 0);
+        $result = getPhotosByAlbum($conn, $albumId);
 
         while ($row = $result->fetch_assoc()) {
             $photos[] = $row;
