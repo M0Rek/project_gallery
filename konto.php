@@ -11,7 +11,6 @@ if (!isset($_SESSION["user-data"])) {
 $conn = connectToDB();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    print_r($_POST);
     if ($_POST['T'] == 'change-data') {
         $currentPwd = $_POST["password"];
         $userLogin = ($_SESSION["user-data"]["login"]);

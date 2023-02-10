@@ -129,6 +129,26 @@ function getNotEmptyAlbumsCount($conn)
     return $stmt->get_result();
 }
 
+function getAlbumsForAdminCount($conn)
+{
+    $stmt = $conn->prepare("SELECT count(albumy.id) as count FROM albumy LEFT JOIN 
+    (SELECT id,opis,id_albumu,zaakceptowane FROM zdjecia WHERE zaakceptowane = 0) as niezaakceptowane on niezaakceptowane.id_albumu = albumy.id
+        LEFT JOIN uzytkownicy ON id_uzytkownika = uzytkownicy.id");
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+function getAlbumsForAdminPaginated($conn, $currentPage, $itemsPerPage)
+{
+    $stmt = $conn->prepare("SELECT albumy.id as id, count(niezaakceptowane.id) as niezaakceptowanych,tytul, data, date(data) as krotka_data,uzytkownicy.login as tworca FROM albumy LEFT JOIN 
+    (SELECT id,opis,id_albumu,zaakceptowane FROM zdjecia WHERE zaakceptowane = 0) as niezaakceptowane on niezaakceptowane.id_albumu = albumy.id
+        LEFT JOIN uzytkownicy ON id_uzytkownika = uzytkownicy.id GROUP BY albumy.id ORDER BY niezaakceptowanych DESC LIMIT " . (($currentPage - 1) * $itemsPerPage) . ", " . $itemsPerPage);
+
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+
 function getNotEmptyAlbumsPaginated($conn, $sortBy, $asc, $currentPage, $itemsPerPage)
 {
     $stmt = $conn->prepare("SELECT albumy.id as id, zaakceptowane.id as zdjecie,tytul, data, date(data) as krotka_data,uzytkownicy.login as tworca FROM albumy INNER JOIN 
@@ -145,6 +165,14 @@ function getAlbumsByUser($conn, $userId)
         LEFT JOIN zdjecia ON albumy.id = id_albumu 
         WHERE id_uzytkownika = ? GROUP BY albumy.id, albumy.data ORDER BY data DESC");
     $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+function getPhotosByAlbum($conn, $albumId)
+{
+    $stmt = $conn->prepare("SELECT id,opis,id_albumu,data,zaakceptowane FROM zdjecia WHERE id_albumu = ?");
+    $stmt->bind_param("i", $albumId);
     $stmt->execute();
     return $stmt->get_result();
 }
@@ -243,6 +271,28 @@ function deleteAlbum($conn, $userId, $albumId)
     rmdir("photo/" . $albumId);
     return true;
 }
+
+function changeAlbumAsAdmin($conn, $albumId, $albumTitle)
+{
+    $stmt = $conn->prepare("UPDATE `albumy` SET `tytul` = ? WHERE id = ?");
+    $stmt->bind_param('si', $albumTitle, $albumId);
+    $stmt->execute();
+    return mysqli_affected_rows($conn) > 0;
+}
+
+function deleteAlbumAsAdmin($conn, $albumId)
+{
+    $stmt = $conn->prepare("DELETE FROM `albumy` WHERE id = ?");
+    $stmt->bind_param('i', $albumId);
+    $stmt->execute();
+    if (!mysqli_affected_rows($conn) > 0)
+        return false;
+
+    array_map('unlink', glob("photo/" . $albumId . "/*.*"));
+    rmdir("photo/" . $albumId);
+    return true;
+}
+
 
 function changePhoto($conn, $userId, $photoId, $photoTitle)
 {
