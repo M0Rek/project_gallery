@@ -14,13 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION["login-error"]["database-error"] = true;
         } else {
             try {
-                $stmt = $conn->prepare("SELECT * FROM uzytkownicy where login LIKE ? AND haslo LIKE md5(?)");
-                $stmt->bind_param('ss', $login, $password);
-                $stmt->execute();
-                $result = $stmt->get_result();
-                if ($result->num_rows == 1) {
+                if (($result = verifyUser($conn, $login, $password))->num_rows == 1) {
                     $userData = getUserData($result);
-
                     if ($userData["is-active"] != 1) {
 
                         $_SESSION["login-error"]["user-blocked"] = true;
