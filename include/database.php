@@ -177,6 +177,13 @@ function getPhotosByAlbum($conn, $albumId)
     return $stmt->get_result();
 }
 
+function getUnacceptedPhotos($conn)
+{
+    $stmt = $conn->prepare("SELECT id,opis,id_albumu,data,zaakceptowane FROM zdjecia WHERE zaakceptowane = 0");
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
 function getPhotosByAlbumAndUser($conn, $albumId, $userId)
 {
     $stmt = $conn->prepare("SELECT zdjecia.id as id,opis,id_albumu,zdjecia.data as data,zaakceptowane,uzytkownicy.login as tworca , avg(ocena) as ocena, tytul as tytul_albumu FROM zdjecia
@@ -314,6 +321,40 @@ function deletePhoto($conn, $userId, $albumId, $photoId)
     unlink(minPhotoPath($albumId, $photoId));
     return true;
 }
+
+function changePhotoAsAdmin($conn, $photoId, $photoTitle)
+{
+    $photoTitle = htmlspecialchars($photoTitle);
+    $stmt = $conn->prepare("UPDATE `zdjecia` INNER JOIN `albumy` ON albumy.id = id_albumu SET `opis` = ? WHERE zdjecia.id = ?");
+    $stmt->bind_param('si', $photoTitle, $photoId);
+    $stmt->execute();
+    return mysqli_affected_rows($conn) > 0;
+}
+
+function deletePhotoAsAdmin($conn, $albumId, $photoId)
+{
+    $stmt = $conn->prepare("DELETE `zdjecia` FROM `zdjecia` INNER JOIN `albumy` ON albumy.id = id_albumu WHERE zdjecia.id = ?");
+    $stmt->bind_param('i', $photoId);
+    $stmt->execute();
+    if (!mysqli_affected_rows($conn) > 0)
+        return false;
+
+    unlink(photoPath($albumId, $photoId));
+    unlink(minPhotoPath($albumId, $photoId));
+    return true;
+}
+
+function acceptPhotoAsAdmin($conn, $photoId)
+{
+    $stmt = $conn->prepare("UPDATE `zdjecia` SET `zaakceptowane` = 1 WHERE zdjecia.id = ?");
+    $stmt->bind_param('i', $photoId);
+    $stmt->execute();
+    if (!mysqli_affected_rows($conn) > 0)
+        return false;
+
+    return true;
+}
+
 
 function deleteUser($conn, $userId)
 {
