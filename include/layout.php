@@ -21,6 +21,26 @@ function head($title = "", $active = "index")
 <div class="container-md mt-5">';
 }
 
+function adminHead($title = "", $active = "index")
+{
+    return '
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Galeria - ' . $title . '</title>
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link href="style/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <link href="style/style.css" rel="stylesheet">
+</head>
+<body>
+<div id="wrap">
+<div id="main">
+' . navbar($active, true) . '
+<div class="container-md mt-5">';
+}
+
 function footer($script = "")
 {
     $txt = '<script src="javascript/bootstrap.bundle.min.js"></script>';
@@ -47,17 +67,17 @@ function isActive($active, $nav)
     return ($active == $nav) ? " active" : "";
 }
 
-function navbar($active = "index")
+function navbar($active = "index", $admin = false)
 {
     return '
-<nav class="navbar sticky-top navbar-dark bg-primary navbar-expand-lg">
+<nav class="navbar sticky-top navbar-dark ' . (($admin) ? 'bg-secondary' : 'bg-primary') . ' navbar-expand-lg">
   <div class="container-fluid">
-    <a class="navbar-brand" id="index" href="index.php">Galeria</a>
+    <a class="navbar-brand" id="index" href="index.php">' . (($admin) ? 'Panel administracyjny' : 'Galeria') . '</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-      ' . navbarItems($active) . '
+      ' . (($admin) ? adminNavbarItems($active) : navbarItems($active)) . '
     </div>
   </div>
 </nav>';
@@ -78,7 +98,7 @@ function navbarItems($active)
         $txt .= '<li class="nav-item" ><a id="wyloguj" class="nav-link' . isActive($active, "wyloguj") . '" href = "wyloguj.php" >Wyloguj się</a ></li >';
 
         if ($userData["role"] == "moderator" || $userData["role"] == "administrator") {
-            $txt .= '<li class="nav-item" ><a id="admin" class="nav-link' . isActive($active, "admin") . '" href = "admin/index.php" >Panel administracyjny</a ></li >';
+            $txt .= '<li class="nav-item" ><a id="admin" class="nav-link' . isActive($active, "admin") . '" href = "admin.php" >Panel administracyjny</a ></li >';
         }
     } else {
         $txt .= '<li class="nav-item" ><a id="log" class="nav-link' . isActive($active, "logrej") . '" href = "logrej.php" >Zaloguj się</a ></li >';
@@ -87,6 +107,25 @@ function navbarItems($active)
     $txt .= '</ul>';
     return $txt;
 }
+
+function adminNavbarItems($active)
+{
+    $userData = (isset($_SESSION["user-data"])) ? $_SESSION["user-data"] : null;
+    $txt = '<ul class="navbar-nav mr-auto">';
+
+    if (isset($userData) && ($userData["role"] == "moderator" || $userData["role"] == "administrator")) {
+        if ($userData["role"] == "administrator") {
+            $txt .= '<li class="nav-item"><a id="admin-albumy" class="nav-link' . isActive($active, "admin-albumy") . '" href="admin-albumy.php">Albumy</a></li>';
+            $txt .= '<li class="nav-item" ><a id="admin-uzytkownicy" class="nav-link' . isActive($active, "admin-uzytkownicy") . '" href = "admin-uzytkownicy.php" >Użytkownicy</a ></li >';
+        }
+        $txt .= '<li class="nav-item" ><a id="admin-zdjecia" class="nav-link' . isActive($active, "admin-zdjecia") . '" href = "admin-zdjecia.php" >Zdjęcia</a ></li >';
+        $txt .= '<li class="nav-item" ><a id="admin-komentarze" class="nav-link' . isActive($active, "admin-komentarze") . '" href = "admin-komentarze.php" >Komentarze</a ></li >';
+        $txt .= '<li class="nav-item" ><a id="powrot" class="nav-link" href = "index.php" >Powrót do galerii</a ></li >';
+    }
+    $txt .= '</ul>';
+    return $txt;
+}
+
 
 function pagination($currentPage, $pageCount)
 {
