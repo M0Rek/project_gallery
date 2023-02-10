@@ -166,6 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             $result = getAlbumsByUser($conn, $_SESSION["user-data"]["id"]);
 
+            $albums = (array)null;
 
             while ($row = $result->fetch_assoc()) {
                 $albums[] = $row;
@@ -240,6 +241,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <?php
 
                 $result = getPhotosByAlbumAndUser($conn, intval($_GET["album"]), $_SESSION["user-data"]["id"]);
+
+                $photos = (array)null;
 
                 while ($row = $result->fetch_assoc()) {
                     $photos[] = $row;

@@ -180,6 +180,8 @@ if (!$exists) {
         <?php
         $result = getPhotoComments($conn, $id);
 
+        $comments = (array)null;
+
         while ($row = $result->fetch_assoc()) {
             $comments[] = $row;
         }

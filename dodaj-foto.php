@@ -138,6 +138,8 @@ if ($result->num_rows == 0) {
 
         $result = getPhotosByAlbum($conn, $albumId);
 
+        $photos = (array)null;
+
         while ($row = $result->fetch_assoc()) {
             $photos[] = $row;
         }

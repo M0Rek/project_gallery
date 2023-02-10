@@ -9,6 +9,8 @@ $items = 20;
 $conn = connectToDB();
 $result = getTopPhotos($conn, $items);
 
+$photos = (array)null;
+
 while ($row = $result->fetch_assoc()) {
     $photos[] = $row;
 

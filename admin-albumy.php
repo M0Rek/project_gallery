@@ -37,6 +37,8 @@ $currentPage = getCurrentPage($pageCount);
 
 $result = getAlbumsForAdminPaginated($conn, $currentPage, $itemsPerPage);
 
+$albums = (array)null;
+
 while ($row = $result->fetch_assoc()) {
     $albums[] = $row;
 }

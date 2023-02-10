@@ -52,6 +52,7 @@ if (!$exists) {
 
     $result = getPhotosByAlbumPaginated($conn, $albumId, 1, $currentPage, $itemsPerPage);
 
+    $photos = (array)null;
 
     while ($row = $result->fetch_assoc()) {
         $photos[] = $row;

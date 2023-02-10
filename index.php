@@ -34,6 +34,8 @@ else $asc = "ASC";
 
 $result = getNotEmptyAlbumsPaginated($conn, $sort, $asc, $currentPage, $itemsPerPage);
 
+$albums = (array)null;
+
 while ($row = $result->fetch_assoc()) {
     $albums[] = $row;
 }
