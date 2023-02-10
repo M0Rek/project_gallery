@@ -361,6 +361,37 @@ function acceptPhotoAsAdmin($conn, $photoId)
     return true;
 }
 
+function changeCommentAsAdmin($conn, $commentId, $commentContent)
+{
+    $commentContent = htmlspecialchars($commentContent);
+    $stmt = $conn->prepare("UPDATE `zdjecia_komentarze` SET `komentarz` = ? WHERE zdjecia_komentarze.id = ?");
+    $stmt->bind_param('si', $commentContent, $commentId);
+    $stmt->execute();
+    return mysqli_affected_rows($conn) > 0;
+}
+
+function deleteCommentAsAdmin($conn, $commentId)
+{
+    $stmt = $conn->prepare("DELETE `zdjecia_komentarze` FROM `zdjecia_komentarze` WHERE zdjecia_komentarze.id = ?");
+    $stmt->bind_param('i', $commentId);
+    $stmt->execute();
+    if (!mysqli_affected_rows($conn) > 0)
+        return false;
+
+    return true;
+}
+
+function acceptCommentAsAdmin($conn, $commentId)
+{
+    $stmt = $conn->prepare("UPDATE `zdjecia_komentarze` SET `zaakceptowany` = 1 WHERE zdjecia_komentarze.id = ?");
+    $stmt->bind_param('i', $commentId);
+    $stmt->execute();
+    if (!mysqli_affected_rows($conn) > 0)
+        return false;
+
+    return true;
+}
+
 
 function deleteUser($conn, $userId)
 {
@@ -554,6 +585,24 @@ function getPhotoComments($conn, $photoId)
     FROM `zdjecia_komentarze` 
     LEFT JOIN uzytkownicy ON id_uzytkownika =  uzytkownicy.id WHERE id_zdjecia = ? ORDER BY data DESC");
     $stmt->bind_param("i", $photoId);
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+function getAllComments($conn)
+{
+    $stmt = $conn->prepare("SELECT zdjecia_komentarze.id, zaakceptowany, komentarz, zdjecia_komentarze.data as data, uzytkownicy.login as tworca 
+    FROM `zdjecia_komentarze` 
+    LEFT JOIN uzytkownicy ON id_uzytkownika =  uzytkownicy.id ORDER BY data DESC");
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+function getUnacceptedComments($conn)
+{
+    $stmt = $conn->prepare("SELECT  zdjecia_komentarze.id, zaakceptowany, komentarz, zdjecia_komentarze.data as data, uzytkownicy.login as tworca 
+    FROM `zdjecia_komentarze` 
+    LEFT JOIN uzytkownicy ON id_uzytkownika =  uzytkownicy.id WHERE zaakceptowany = 0 ORDER BY data DESC");
     $stmt->execute();
     return $stmt->get_result();
 }
