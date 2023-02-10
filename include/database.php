@@ -34,6 +34,70 @@ function getUserData(mysqli_result $result)
     return $user_data;
 }
 
+function getUsersByRole($conn, $role)
+{
+    $stmt = $conn->prepare("SELECT id, login, email, zarejestrowany, uprawnienia, aktywny FROM uzytkownicy where uzytkownicy.uprawnienia LIKE ?");
+    $stmt->bind_param('s', $role);
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+function changeUserRole($conn, $userId, $userRole)
+{
+    if ($_SESSION["user-data"]["id"] == $userId) {
+        return false;
+    }
+
+    $stmt = $conn->prepare("UPDATE `uzytkownicy` SET `uprawnienia` = ? WHERE `uzytkownicy`.`id` = ?");
+    $stmt->bind_param('si', $userRole, $userId);
+    $stmt->execute();
+    return mysqli_affected_rows($conn) > 0;
+}
+
+function changeUserBlock($conn, $userId, $active)
+{
+    if ($_SESSION["user-data"]["id"] == $userId) {
+        return false;
+    }
+
+    $stmt = $conn->prepare("UPDATE `uzytkownicy` SET `aktywny` = ? WHERE `uzytkownicy`.`id` = ?");
+    $stmt->bind_param('ii', $active, $userId);
+    $stmt->execute();
+    return mysqli_affected_rows($conn) > 0;
+}
+
+function deleteUserAsAdmin($conn, $userId)
+{
+    if ($_SESSION["user-data"]["id"] == $userId) {
+        return false;
+    }
+
+    if (!deleteAllUserData($conn, $userId)) {
+        return false;
+    };
+
+    $stmt = $conn->prepare("DELETE uzytkownicy FROM uzytkownicy WHERE id = ? ");
+    $stmt->bind_param('i', $userId);
+    $stmt->execute();
+    return (!mysqli_affected_rows($conn) > 0);
+}
+
+// Funkcja potrzebna tylko do usunięcia plików zdjęć. Wszystko inne jest usunięte za pomocą cascade.
+function deleteAllUserData($conn, $userId)
+{
+    if ($_SESSION["user-data"]["id"] == $userId) {
+        return false;
+    }
+
+    $result = getAlbumsByUser($conn, $userId);
+
+    while ($row = $result->fetch_assoc()) {
+        deleteAlbum($conn, $userId, $row["id"]);
+    }
+
+    return true;
+}
+
 function verifyUser($conn, $login, $password)
 {
     $stmt = $conn->prepare("SELECT * FROM uzytkownicy where login LIKE ? AND haslo LIKE md5(?)");
@@ -375,10 +439,7 @@ function deleteCommentAsAdmin($conn, $commentId)
     $stmt = $conn->prepare("DELETE `zdjecia_komentarze` FROM `zdjecia_komentarze` WHERE zdjecia_komentarze.id = ?");
     $stmt->bind_param('i', $commentId);
     $stmt->execute();
-    if (!mysqli_affected_rows($conn) > 0)
-        return false;
-
-    return true;
+    return (!mysqli_affected_rows($conn) > 0);
 }
 
 function acceptCommentAsAdmin($conn, $commentId)
@@ -386,15 +447,20 @@ function acceptCommentAsAdmin($conn, $commentId)
     $stmt = $conn->prepare("UPDATE `zdjecia_komentarze` SET `zaakceptowany` = 1 WHERE zdjecia_komentarze.id = ?");
     $stmt->bind_param('i', $commentId);
     $stmt->execute();
-    if (!mysqli_affected_rows($conn) > 0)
-        return false;
-
-    return true;
+    return (!mysqli_affected_rows($conn) > 0);
 }
 
 
 function deleteUser($conn, $userId)
 {
+    if ($_SESSION["user-data"]["id"] != $userId) {
+        return false;
+    }
+
+    if (!deleteAllUserData($conn, $userId)) {
+        return false;
+    };
+
     $stmt = $conn->prepare("DELETE uzytkownicy FROM uzytkownicy WHERE id = ? ");
     $stmt->bind_param('i', $userId);
     $stmt->execute();
@@ -583,7 +649,7 @@ function getPhotoComments($conn, $photoId)
 {
     $stmt = $conn->prepare("SELECT komentarz, zdjecia_komentarze.data as data, uzytkownicy.login as tworca 
     FROM `zdjecia_komentarze` 
-    LEFT JOIN uzytkownicy ON id_uzytkownika =  uzytkownicy.id WHERE id_zdjecia = ? ORDER BY data DESC");
+    LEFT JOIN uzytkownicy ON id_uzytkownika =  uzytkownicy.id WHERE id_zdjecia = ? AND zaakceptowany = 1 ORDER BY data DESC");
     $stmt->bind_param("i", $photoId);
     $stmt->execute();
     return $stmt->get_result();
@@ -591,7 +657,7 @@ function getPhotoComments($conn, $photoId)
 
 function getAllComments($conn)
 {
-    $stmt = $conn->prepare("SELECT zdjecia_komentarze.id, zaakceptowany, komentarz, zdjecia_komentarze.data as data, uzytkownicy.login as tworca 
+    $stmt = $conn->prepare("SELECT zdjecia_komentarze.id, id_zdjecia, zaakceptowany, komentarz, zdjecia_komentarze.data as data, uzytkownicy.login as tworca 
     FROM `zdjecia_komentarze` 
     LEFT JOIN uzytkownicy ON id_uzytkownika =  uzytkownicy.id ORDER BY data DESC");
     $stmt->execute();
@@ -600,7 +666,7 @@ function getAllComments($conn)
 
 function getUnacceptedComments($conn)
 {
-    $stmt = $conn->prepare("SELECT  zdjecia_komentarze.id, zaakceptowany, komentarz, zdjecia_komentarze.data as data, uzytkownicy.login as tworca 
+    $stmt = $conn->prepare("SELECT  zdjecia_komentarze.id, id_zdjecia, zaakceptowany, komentarz, zdjecia_komentarze.data as data, uzytkownicy.login as tworca 
     FROM `zdjecia_komentarze` 
     LEFT JOIN uzytkownicy ON id_uzytkownika =  uzytkownicy.id WHERE zaakceptowany = 0 ORDER BY data DESC");
     $stmt->execute();
