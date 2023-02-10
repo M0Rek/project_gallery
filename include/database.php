@@ -34,6 +34,30 @@ function getUserData(mysqli_result $result)
     return $user_data;
 }
 
+function verifyUser($conn, $login, $password)
+{
+    $stmt = $conn->prepare("SELECT * FROM uzytkownicy where login LIKE ? AND haslo LIKE md5(?)");
+    $stmt->bind_param('ss', $login, $password);
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+function changePassword($conn, $userLogin, $newPwd)
+{
+    $stmt = $conn->prepare("UPDATE `uzytkownicy` SET `haslo` = md5(?) WHERE `uzytkownicy`.`login` = ?");
+    $stmt->bind_param('ss', $newPwd, $userLogin);
+    $stmt->execute();
+    return mysqli_affected_rows($conn) > 0;
+}
+
+function changeEmail($conn, $userLogin, $newEmail)
+{
+    $stmt = $conn->prepare("UPDATE `uzytkownicy` SET `email` = ? WHERE `uzytkownicy`.`login` = ?");
+    $stmt->bind_param('ss', $newEmail, $userLogin);
+    $stmt->execute();
+    return mysqli_affected_rows($conn) > 0;
+}
+
 function insertAlbum($conn, $title)
 {
     unset($_SESSION["add-album-error"]);
@@ -125,10 +149,14 @@ function getAlbumsByUser($conn, $userId)
     return $stmt->get_result();
 }
 
-function getPhotosByAlbum($conn, $albumId)
+function getPhotosByAlbumAndUser($conn, $albumId, $userId)
 {
-    $stmt = $conn->prepare("SELECT id,opis,id_albumu,data,zaakceptowane FROM zdjecia WHERE id_albumu = ?");
-    $stmt->bind_param("i", $albumId);
+    $stmt = $conn->prepare("SELECT zdjecia.id as id,opis,id_albumu,zdjecia.data as data,zaakceptowane,uzytkownicy.login as tworca , avg(ocena) as ocena, tytul as tytul_albumu FROM zdjecia
+                                             INNER JOIN albumy on id_albumu = albumy.id      
+                                             LEFT JOIN zdjecia_oceny ON id_zdjecia = zdjecia.id 
+                                             LEFT JOIN uzytkownicy on albumy.id_uzytkownika = uzytkownicy.id
+                                            WHERE id_albumu = ? and uzytkownicy.id = ? GROUP BY id,data");
+    $stmt->bind_param("ii", $albumId, $userId);
     $stmt->execute();
     return $stmt->get_result();
 }
@@ -160,7 +188,11 @@ function getNewestPhotos($conn, $itemsNo)
 
 function getPhotosByAlbumPaginated($conn, $albumId, $accepted, $currentPage, $itemsPerPage)
 {
-    $stmt = $conn->prepare("SELECT id,opis,id_albumu,data,zaakceptowane FROM zdjecia WHERE id_albumu = ? AND zaakceptowane = ? LIMIT " . (($currentPage - 1) * $itemsPerPage) . ", " . $itemsPerPage);
+    $stmt = $conn->prepare("SELECT zdjecia.id as id,opis,id_albumu,zdjecia.data as data,zaakceptowane,uzytkownicy.login as tworca , avg(ocena) as ocena, tytul as tytul_albumu FROM zdjecia
+                                             INNER JOIN albumy on id_albumu = albumy.id      
+                                             LEFT JOIN zdjecia_oceny ON id_zdjecia = zdjecia.id 
+                                             LEFT JOIN uzytkownicy on albumy.id_uzytkownika = uzytkownicy.id
+                                            WHERE id_albumu = ? AND zaakceptowane = ? GROUP BY id,data LIMIT " . (($currentPage - 1) * $itemsPerPage) . ", " . $itemsPerPage);
     $stmt->bind_param("ii", $albumId, $accepted);
     $stmt->execute();
     return $stmt->get_result();
@@ -189,6 +221,59 @@ function IsUserAlbum($conn, $albumId)
         }
     }
     return false;
+}
+
+function changeAlbum($conn, $userId, $albumId, $albumTitle)
+{
+    $stmt = $conn->prepare("UPDATE `albumy` SET `tytul` = ? WHERE id_uzytkownika = ? AND id = ?");
+    $stmt->bind_param('sii', $albumTitle, $userId, $albumId);
+    $stmt->execute();
+    return mysqli_affected_rows($conn) > 0;
+}
+
+function deleteAlbum($conn, $userId, $albumId)
+{
+    $stmt = $conn->prepare("DELETE FROM `albumy` WHERE id_uzytkownika = ? AND id = ?");
+    $stmt->bind_param('ii', $userId, $albumId);
+    $stmt->execute();
+    if (!mysqli_affected_rows($conn) > 0)
+        return false;
+
+    array_map('unlink', glob("photo/" . $albumId . "/*.*"));
+    rmdir("photo/" . $albumId);
+    return true;
+}
+
+function changePhoto($conn, $userId, $photoId, $photoTitle)
+{
+    $stmt = $conn->prepare("UPDATE `zdjecia` INNER JOIN `albumy` ON albumy.id = id_albumu SET `opis` = ? WHERE id_uzytkownika = ? AND zdjecia.id = ?");
+    $stmt->bind_param('sii', $photoTitle, $userId, $photoId);
+    $stmt->execute();
+    return mysqli_affected_rows($conn) > 0;
+}
+
+function deletePhoto($conn, $userId, $albumId, $photoId)
+{
+    $stmt = $conn->prepare("DELETE `zdjecia` FROM `zdjecia` INNER JOIN `albumy` ON albumy.id = id_albumu WHERE id_uzytkownika = ? AND zdjecia.id = ?");
+    $stmt->bind_param('ii', $userId, $photoId);
+    $stmt->execute();
+    if (!mysqli_affected_rows($conn) > 0)
+        return false;
+
+    unlink(photoPath($albumId, $photoId));
+    unlink(minPhotoPath($albumId, $photoId));
+    return true;
+}
+
+function deleteUser($conn, $userId)
+{
+    $stmt = $conn->prepare("DELETE uzytkownicy FROM uzytkownicy WHERE id = ? ");
+    $stmt->bind_param('i', $userId);
+    $stmt->execute();
+    if (!mysqli_affected_rows($conn) > 0)
+        return false;
+
+    return true;
 }
 
 function savePhoto($conn)
