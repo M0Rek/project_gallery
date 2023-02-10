@@ -59,14 +59,13 @@ if (!$exists) {
 
     ?>
 
-    <div class="row my-3 d-flex justify-content-center g-3">
 
-        <?php
+    <?php
         if (isset($photos)) {
             echo photos($photos);
         }
         ?>
-    </div>
+
     <?php
     echo pagination($currentPage, $pageCount);
     echo backToAlbumsButton();

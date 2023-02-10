@@ -151,7 +151,7 @@ function backToAlbumButton($albumId)
 
 function photos($photos)
 {
-    $txt = "";
+    $txt = '<div class="row my-3 d-flex justify-content-center g-3">';
     foreach ($photos as $photo) {
         $txt .= '<div class="d-flex w-auto justify-content-center">
             <img alt="' . $photo["opis"] . '" 
@@ -167,5 +167,5 @@ function photos($photos)
             <b>Ocena:</b> ' . $photo["ocena"] . '"  
             src="' . minPhotoPath($photo["id_albumu"], $photo["id"]) . '"></div>';
     }
-    return $txt;
+    return $txt . "</div>";
 }
