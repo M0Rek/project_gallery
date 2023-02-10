@@ -7,7 +7,6 @@ if (!isset($_SESSION["user-data"]) || $_SESSION["user-data"]["role"] != "adminis
 }
 
 $conn = connectToDB();
-print_r($_POST);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($_POST['T'] == 'change-role') {
