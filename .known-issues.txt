@@ -1,0 +1,2 @@
+1. Custom validation for retyped passwords and album names does not work. Easiest fix is to get rid of bootstrap validation, moderate effort.
+2. Previous and next arrows in photo traversing works unexpectedly when on last photo on an album. Issue with the traversing logic, minor effort.
