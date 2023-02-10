@@ -28,7 +28,7 @@ echo adminHead("Admin - Albumy", "admin-albumy");
 
 $result = getAlbumsForAdminCount($conn);
 
-$itemsPerPage = 3;
+$itemsPerPage = 30;
 $itemsCount = $result->fetch_assoc()["count"];
 
 $pageCount = ceil($itemsCount / $itemsPerPage);
@@ -85,7 +85,8 @@ while ($row = $result->fetch_assoc()) {
                 <td><?php echo $album["niezaakceptowanych"] ?></td>
                 <td>
                     <button class="btn btn-outline-dark"
-                            onclick="redirectToPage('album.php?id=<?php echo $album["id"] ?>')">Przejdź
+                            onclick="redirectToPage('admin-zdjecia.php?showBy=album&albumId=<?php echo $album["id"] ?>')">
+                        Przejdź
                     </button>
                 </td>
                 <td>
