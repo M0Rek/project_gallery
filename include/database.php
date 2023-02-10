@@ -235,6 +235,7 @@ function getPhotosByAlbumPaginated($conn, $albumId, $accepted, $currentPage, $it
 
 function insertPhoto($conn, $desc, $albumId)
 {
+    $desc = htmlspecialchars($desc);
 
     if (!isset($_SESSION["user-data"])) {
         $_SESSION["add-photo-error"]["not-logged-in"] = true;
@@ -260,6 +261,8 @@ function IsUserAlbum($conn, $albumId)
 
 function changeAlbum($conn, $userId, $albumId, $albumTitle)
 {
+    $albumTitle = htmlspecialchars($albumTitle);
+
     $stmt = $conn->prepare("UPDATE `albumy` SET `tytul` = ? WHERE id_uzytkownika = ? AND id = ?");
     $stmt->bind_param('sii', $albumTitle, $userId, $albumId);
     $stmt->execute();
@@ -281,6 +284,8 @@ function deleteAlbum($conn, $userId, $albumId)
 
 function changeAlbumAsAdmin($conn, $albumId, $albumTitle)
 {
+    $albumTitle = htmlspecialchars($albumTitle);
+
     $stmt = $conn->prepare("UPDATE `albumy` SET `tytul` = ? WHERE id = ?");
     $stmt->bind_param('si', $albumTitle, $albumId);
     $stmt->execute();
@@ -303,6 +308,7 @@ function deleteAlbumAsAdmin($conn, $albumId)
 
 function changePhoto($conn, $userId, $photoId, $photoTitle)
 {
+    $photoTitle = htmlspecialchars($photoTitle);
     $stmt = $conn->prepare("UPDATE `zdjecia` INNER JOIN `albumy` ON albumy.id = id_albumu SET `opis` = ? WHERE id_uzytkownika = ? AND zdjecia.id = ?");
     $stmt->bind_param('sii', $photoTitle, $userId, $photoId);
     $stmt->execute();
@@ -521,7 +527,7 @@ function commentPhoto($conn, $photoId, $userId, $comment)
 {
     unset($_SESSION["add-comment-error"]);
 
-    $comment = trim($comment);
+    $comment = htmlspecialchars(trim($comment));
 
     if ($comment == "") {
         $_SESSION["add-comment-error"]["invalid-comment"] = true;

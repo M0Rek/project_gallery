@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <form method="post" id="redo-form" action="konto.php" class="row g-3">
                 <input type="hidden" name="T" value="change-data"/>
                 <div class="col-12">
-                    <div>Email: <?php echo $_SESSION["user-data"]["email"] ?></div>
+                    <div>Email: <?php echo htmlspecialchars($_SESSION["user-data"]["email"]) ?></div>
                     <div>Hasło: ********</div>
 
                     <div class="col-md-4 col-12">
