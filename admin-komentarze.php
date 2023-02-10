@@ -70,6 +70,7 @@ while ($row = $result->fetch_assoc()) {
         <tr>
             <th scope="col">#</th>
             <th scope="col">Komentarz</th>
+            <th scope="col">Zdjęcie</th>
             <th scope="col">Twórca</th>
             <th scope="col">Utworzono</th>
             <th scope="col">Zaakceptuj</th>
@@ -104,6 +105,7 @@ while ($row = $result->fetch_assoc()) {
                         </div>
                     </form>
                 </td>
+                <td><?php echo $comment["id_zdjecia"] ?></td>
                 <td><?php echo $comment["tworca"] ?></td>
                 <td><?php echo $comment["data"] ?></td>
                 <td><?php if ($comment["zaakceptowany"] == 0) { ?>
